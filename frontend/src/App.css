@@ -1,0 +1,250 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #e5e9f2;
+  margin: 0;
+  padding: 0;
+}
+
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: #2563eb;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  height: 56px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 56px;
+  width: 220px;
+  height: calc(100vh - 56px);
+  background: #1e40af;
+  color: #fff;
+  padding-top: 18px;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.04);
+  z-index: 99;
+  transition: none;
+}
+
+.main-content {
+  margin-left: 220px;
+  margin-top: 56px;
+  padding: 36px 36px 28px 36px;
+  min-height: calc(100vh - 56px);
+  background: #e5e9f2;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  padding: 32px 32px 24px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+h2, h3 {
+  text-align: center;
+  color: #2d3a4b;
+  margin: 0 0 12px 0;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+input, textarea {
+  padding: 12px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 7px;
+  font-size: 1rem;
+  background: #f9fafb;
+  transition: border 0.2s;
+}
+input:focus, textarea:focus {
+  border: 1.5px solid #4f8cff;
+  outline: none;
+  background: #fff;
+}
+
+button {
+  background: #4f8cff;
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  padding: 12px 0;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 4px;
+}
+button:hover {
+  background: #2563eb;
+}
+button[disabled] {
+  background: #b6c6e3;
+  cursor: not-allowed;
+}
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 0;
+}
+
+table {
+  width: 100%;
+  min-width: 800px;
+  border-collapse: collapse;
+  margin-top: 18px;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  font-size: 1rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+}
+th, td {
+  padding: 14px 12px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: #f1f5fb;
+  color: #2d3a4b;
+  font-weight: 600;
+}
+tr:last-child td {
+  border-bottom: none;
+}
+
+img {
+  display: block;
+}
+
+a {
+  color: #4f8cff;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+.logout-btn {
+  background: #e53e3e;
+  color: #fff;
+  margin-bottom: 10px;
+  margin-top: 0;
+}
+.logout-btn:hover {
+  background: #b91c1c;
+}
+
+.filter-input {
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border-radius: 7px;
+  border: 1px solid #d1d5db;
+  width: 100%;
+  font-size: 1rem;
+}
+
+@media (max-width: 1200px) {
+  .main-content, .container {
+    padding: 12px 2vw;
+  }
+  table {
+    min-width: 600px;
+    font-size: 0.97rem;
+  }
+}
+@media (max-width: 900px) {
+  .sidebar {
+    width: 60px;
+    padding-top: 10px;
+  }
+  .main-content {
+    margin-left: 60px;
+    padding: 10px 2vw;
+  }
+}
+@media (max-width: 700px) {
+  .topbar {
+    padding: 0 6px;
+    height: 48px;
+  }
+  .main-content {
+    margin-left: 0;
+    margin-top: 48px;
+    padding: 6px 1vw;
+  }
+  .sidebar {
+    display: none;
+  }
+  .container {
+    padding: 8px 2vw;
+  }
+}
