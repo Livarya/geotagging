@@ -19,12 +19,12 @@ const PrintLaporan = () => {
   if (!laporan) return <div>Loading...</div>;
 
   return (
-    <div style={{maxWidth:'800px',margin:'0 auto',background:'#fff',padding:'40px 60px',fontFamily:'Times New Roman, Times, serif',fontSize:18,boxShadow:'0 2px 12px #bbb'}}>
+    <div className="print-container" style={{maxWidth:'800px',margin:'0 auto',background:'#fff',padding:'40px 60px',fontFamily:'Times New Roman, Times, serif',fontSize:18,boxShadow:'0 2px 12px #bbb'}}>
       <button onClick={() => window.print()} style={{float:'right',marginBottom:20}}>🖨️ Print</button>
       <div style={{textAlign:'center',marginBottom:24}}>
         <img src={LOGO_URL} alt="logo" style={{height:70,marginBottom:10}} />
         <h2 style={{margin:0,fontFamily:'Times New Roman, Times, serif',fontWeight:700}}>BERITA ACARA PEMERIKSAAN</h2>
-        <div style={{fontSize:16,marginTop:4}}>Instansi Pemerintah</div>
+        <div style={{fontSize:16,marginTop:4}}>BAPENDA</div>
       </div>
       <hr style={{margin:'18px 0'}} />
       <table style={{width:'100%',fontSize:18,marginBottom:18}}>
@@ -73,6 +73,28 @@ const PrintLaporan = () => {
           body { background: #fff !important; }
           button { display: none !important; }
           .sidebar, .topbar { display: none !important; }
+          @page {
+            size: A4 portrait;
+            margin: 10mm;
+          }
+          html, body, #root, .print-container {
+            width: 210mm !important;
+            min-height: 297mm !important;
+            max-height: 297mm !important;
+            overflow: hidden !important;
+          }
+          .print-container {
+            transform: scale(0.93); /* adjust if needed */
+            transform-origin: top left;
+            box-shadow: none !important;
+            padding: 0 !important;
+            margin: 0 auto !important;
+            background: #fff !important;
+          }
+          table, tr, td, div {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+          }
         }
       `}</style>
     </div>
