@@ -4,9 +4,12 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import AdminLayout from '../components/AdminLayout';
+import SuperAdminLayout from '../components/SuperAdminLayout';
+import { FaEye, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 
 const LaporanDitolak = () => {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [laporan, setLaporan] = useState([]);
   const [search, setSearch] = useState('');
   const [tanggal, setTanggal] = useState('');
@@ -14,15 +17,18 @@ const LaporanDitolak = () => {
   const [modal, setModal] = useState({ open: false, id: null });
   const navigate = useNavigate();
 
+  const Layout = user?.role === 'superadmin' ? SuperAdminLayout : AdminLayout;
+
   useEffect(() => {
     fetchLaporan();
-    // eslint-disable-next-line
   }, [tanggal]);
 
   const fetchLaporan = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('/api/laporan', { headers: { Authorization: `Bearer ${token}` } });
+      const res = await axios.get('/api/laporan', { 
+        headers: { Authorization: `Bearer ${token}` } 
+      });
       setLaporan(res.data.filter(l => l.status === 'Ditolak'));
     } catch {
       setLaporan([]);
@@ -30,79 +36,215 @@ const LaporanDitolak = () => {
     setLoading(false);
   };
 
-  const filtered = laporan.filter(l => {
-    const matchSearch =
-      l.nama_merk.toLowerCase().includes(search.toLowerCase()) ||
-      l.user?.nama?.toLowerCase().includes(search.toLowerCase()) ||
-      l.npwpd.toLowerCase().includes(search.toLowerCase());
-    const matchTanggal = tanggal ? l.tanggal.slice(0, 10) === tanggal : true;
-    return matchSearch && matchTanggal;
-  });
-
-  const handleDelete = async () => {
+  const handleSetujui = async (id, e) => {
+    e.stopPropagation();
     try {
-      await axios.delete(`/api/laporan/${modal.id}`, { headers: { Authorization: `Bearer ${token}` } });
-      toast.success('Laporan dihapus');
-      setModal({ open: false, id: null });
+      await axios.put(`/api/laporan/${id}/status`, { status: 'Disetujui' }, { headers: { Authorization: `Bearer ${token}` } });
+      toast.success('Laporan disetujui');
       fetchLaporan();
     } catch {
-      toast.error('Gagal hapus laporan');
+      toast.error('Gagal menyetujui laporan');
     }
   };
 
+  const handleTolak = async (id, e) => {
+    e.stopPropagation();
+    try {
+      await axios.put(`/api/laporan/${id}/status`, { status: 'Ditolak' }, { headers: { Authorization: `Bearer ${token}` } });
+      toast.success('Laporan ditolak');
+      fetchLaporan();
+    } catch {
+      toast.error('Gagal menolak laporan');
+    }
+  };
+
+  const handleDetail = (id, e) => {
+    e.stopPropagation();
+    const prefix = user?.role === 'superadmin' ? '/superadmin' : '/admin';
+    navigate(`${prefix}/laporan/${id}`);
+  };
+
+  if (loading) {
+    return (
+      <Layout title="Laporan Ditolak">
+        <div style={{ color: '#fff', textAlign: 'center' }}>Memuat data...</div>
+      </Layout>
+    );
+  }
+
+  const filtered = laporan
+    .filter(l => 
+      l.nama_merk.toLowerCase().includes(search.toLowerCase()) ||
+      l.npwpd.includes(search) ||
+      l.alamat.toLowerCase().includes(search.toLowerCase())
+    )
+    .filter(l => !tanggal || new Date(l.tanggal).toLocaleDateString() === new Date(tanggal).toLocaleDateString());
+
   return (
-    <div className="container">
-      <ToastContainer position="top-right" autoClose={2000} />
-      <h2>Laporan Ditolak</h2>
-      <div style={{display:'flex',gap:12,flexWrap:'wrap',marginBottom:16}}>
-        <input className="filter-input" placeholder="Cari nama merk / petugas / NPWPD" value={search} onChange={e=>setSearch(e.target.value)} />
-        <input className="filter-input" type="date" value={tanggal} onChange={e=>setTanggal(e.target.value)} style={{maxWidth:160}} />
-      </div>
-      <div className="table-wrapper">
-        {loading ? <div style={{textAlign:'center',padding:40}}><span className="spinner"></span></div> : (
-        <table>
-          <thead>
-            <tr>
-              <th>Nama Petugas</th>
-              <th>Nama Merk</th>
-              <th>NPWPD</th>
-              <th>Alamat</th>
-              <th>Tanggal</th>
-              <th>Status</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map(l => (
-              <tr key={l._id}>
-                <td>{l.user?.nama}</td>
-                <td>{l.nama_merk}</td>
-                <td>{l.npwpd}</td>
-                <td>{l.alamat}</td>
-                <td>{new Date(l.tanggal).toLocaleString()}</td>
-                <td><span style={{color:'#e53e3e'}}>{l.status}</span></td>
-                <td style={{display:'flex',gap:4}}>
-                  <button title="Lihat" onClick={()=>navigate(`/admin/laporan/${l._id}`)}>👁️</button>
-                  <button title="Hapus" onClick={()=>setModal({open:true,id:l._id})}>🗑️</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        )}
-      </div>
-      {modal.open && (
-        <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.2)',zIndex:999,display:'flex',alignItems:'center',justifyContent:'center'}}>
-          <div style={{background:'#fff',padding:32,borderRadius:10,minWidth:300,textAlign:'center',boxShadow:'0 2px 12px #bbb'}}>
-            <div style={{fontSize:18,marginBottom:18}}>Yakin hapus laporan ini?</div>
-            <button style={{background:'#e53e3e',marginRight:10}} onClick={handleDelete}>Ya, Hapus</button>
-            <button style={{background:'#64748b'}} onClick={()=>setModal({open:false,id:null})}>Batal</button>
-          </div>
+    <Layout title="Laporan Ditolak">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        {/* Search and Filter Controls */}
+        <div style={{
+          display: 'flex',
+          gap: '16px',
+          flexWrap: 'wrap',
+          background: 'rgba(30, 41, 59, 0.5)',
+          backdropFilter: 'blur(10px)',
+          borderRadius: '12px',
+          padding: '16px',
+          border: '1px solid rgba(255, 255, 255, 0.1)'
+        }}>
+          <input
+            type="text"
+            placeholder="Cari laporan..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            style={{
+              flex: '1',
+              minWidth: '200px',
+              padding: '8px 16px',
+              borderRadius: '8px',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              background: 'rgba(255, 255, 255, 0.1)',
+              color: '#fff',
+              fontSize: '14px'
+            }}
+          />
+          <input
+            type="date"
+            value={tanggal}
+            onChange={(e) => setTanggal(e.target.value)}
+            style={{
+              padding: '8px 16px',
+              borderRadius: '8px',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              background: 'rgba(255, 255, 255, 0.1)',
+              color: '#fff',
+              fontSize: '14px'
+            }}
+          />
         </div>
-      )}
-      <style>{`.spinner{display:inline-block;width:32px;height:32px;border:4px solid #d1d5db;border-top:4px solid #2563eb;border-radius:50%;animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-    </div>
+
+        {/* Laporan List */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {filtered.map(l => (
+            <div 
+              key={l._id} 
+              style={{
+                background: 'rgba(30, 41, 59, 0.5)',
+                backdropFilter: 'blur(10px)',
+                borderRadius: '12px',
+                padding: '20px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '18px',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                cursor: 'pointer',
+                transition: 'transform 0.2s, box-shadow 0.2s',
+                '&:hover': {
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 6px 16px rgba(0, 0, 0, 0.3)'
+                }
+              }}
+            >
+              <div style={{ flex: 1, color: '#fff' }}>
+                <div style={{ fontWeight: '600', fontSize: '16px' }}>{l.nama_merk}
+                  <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', marginLeft: '8px' }}>({l.npwpd})</span>
+                </div>
+                <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', margin: '4px 0' }}>{l.alamat}</div>
+                <div style={{ fontSize: '13px' }}>
+                  <span style={{
+                    color: '#ef4444',
+                    fontWeight: 600,
+                    marginRight: '12px'
+                  }}>Ditolak</span>
+                  <span style={{ color: 'rgba(255,255,255,0.6)' }}>
+                    {new Date(l.tanggal).toLocaleString()}
+                  </span>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                <button
+                  onClick={(e) => handleDetail(l._id, e)}
+                  style={{
+                    padding: '8px',
+                    borderRadius: '8px',
+                    background: 'rgba(59, 130, 246, 0.5)',
+                    border: '1px solid rgba(59, 130, 246, 0.2)',
+                    color: '#fff',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <FaEye />
+                </button>
+                <button
+                  onClick={(e) => handleSetujui(l._id, e)}
+                  style={{
+                    padding: '8px',
+                    borderRadius: '8px',
+                    background: 'rgba(34, 197, 94, 0.5)',
+                    border: '1px solid rgba(34, 197, 94, 0.2)',
+                    color: '#fff',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <FaCheckCircle />
+                </button>
+                <button
+                  onClick={(e) => handleTolak(l._id, e)}
+                  style={{
+                    padding: '8px',
+                    borderRadius: '8px',
+                    background: 'rgba(239, 68, 68, 0.5)',
+                    border: '1px solid rgba(239, 68, 68, 0.2)',
+                    color: '#fff',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <FaTimesCircle />
+                </button>
+              </div>
+
+              {Array.isArray(l.foto) && l.foto.length > 0 && (
+                <div style={{
+                  minWidth: '80px',
+                  height: '80px',
+                  position: 'relative',
+                  borderRadius: '8px',
+                  overflow: 'hidden',
+                  border: '1px solid rgba(255,255,255,0.1)'
+                }}>
+                  <img 
+                    src={`http://localhost:5000/uploads/${l.foto[0]}`} 
+                    alt="foto" 
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover'
+                    }} 
+                  />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+      <ToastContainer 
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        style={{ zIndex: 9999 }}
+      />
+    </Layout>
   );
 };
 
-export default LaporanDitolak; 
+export default LaporanDitolak;

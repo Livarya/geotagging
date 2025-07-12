@@ -12,10 +12,10 @@ exports.getMe = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
   try {
-    const { nik, nama, jabatan, email } = req.body;
+    const { nip, nama, jabatan, email } = req.body;
     const user = await User.findByIdAndUpdate(
       req.user.id,
-      { nik, nama, jabatan, email },
+      { nip, nama, jabatan, email },
       { new: true, runValidators: true, context: 'query' }
     ).select('-password');
     res.json(user);
@@ -61,6 +61,37 @@ exports.getUserById = async (req, res) => {
     const user = await User.findById(req.params.id).select('-password');
     if (!user) return res.status(404).json({ msg: 'User tidak ditemukan' });
     res.json(user);
+  } catch (err) {
+    res.status(500).json({ msg: 'Server error' });
+  }
+};
+
+exports.updateUserById = async (req, res) => {
+  try {
+    const { nama, email, password, role, status } = req.body;
+    const updateFields = { nama, email, role, status };
+    if (password) {
+      const bcrypt = require('bcryptjs');
+      const salt = await bcrypt.genSalt(10);
+      updateFields.password = await bcrypt.hash(password, salt);
+    }
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      updateFields,
+      { new: true, runValidators: true, context: 'query' }
+    ).select('-password');
+    if (!user) return res.status(404).json({ msg: 'User tidak ditemukan' });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ msg: 'Server error' });
+  }
+};
+
+exports.deleteUser = async (req, res) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) return res.status(404).json({ msg: 'User tidak ditemukan' });
+    res.json({ msg: 'User berhasil dihapus' });
   } catch (err) {
     res.status(500).json({ msg: 'Server error' });
   }

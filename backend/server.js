@@ -4,6 +4,7 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 const jwt = require('jsonwebtoken');
 const path = require('path');
+const superadminRoutes = require('./routes/superadmin');
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/laporan', require('./routes/laporan'));
+app.use('/api/superadmin', superadminRoutes);
 
 const PORT = 5000;
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));

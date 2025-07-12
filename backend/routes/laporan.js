@@ -6,7 +6,7 @@ const multer = require('multer');
 const path = require('path');
 const upload = multer({
   dest: path.join(__dirname, '../uploads'),
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  limits: { fileSize: 20 * 1024 * 1024 }, // 20MB per file
   fileFilter: (req, file, cb) => {
     if (!file.mimetype.startsWith('image/')) {
       return cb(new Error('File harus gambar'));
@@ -23,9 +23,10 @@ const {
   deleteLaporan
 } = require('../controllers/laporanController');
 
-router.post('/upload', auth, upload.single('foto'), (req, res) => {
-  if (!req.file) return res.status(400).json({ msg: 'No file uploaded' });
-  res.json({ filename: req.file.filename });
+router.post('/upload', auth, upload.array('foto', 4), (req, res) => {
+  if (!req.files || req.files.length === 0) return res.status(400).json({ msg: 'No file uploaded' });
+  if (req.files.length > 4) return res.status(400).json({ msg: 'Maksimal 4 foto' });
+  res.json({ filenames: req.files.map(f => f.filename) });
 });
 
 router.post('/', auth, createLaporan);

@@ -4,39 +4,31 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import Dashboard from './pages/Dashboard';
-import AdminPanel from './pages/AdminPanel';
+import AdminDashboard from './pages/AdminDashboard';
 import LaporanDetail from './pages/LaporanDetail';
 import PrintLaporan from './pages/PrintLaporan';
 import ProfilePage from './pages/ProfilePage';
-import Topbar from './components/Topbar';
-import Sidebar from './components/Sidebar';
 import BuatLaporan from './pages/BuatLaporan';
 import RiwayatLaporan from './pages/RiwayatLaporan';
 import SemuaLaporan from './pages/SemuaLaporan';
 import LaporanDisetujui from './pages/LaporanDisetujui';
 import LaporanDitolak from './pages/LaporanDitolak';
 import DataPengguna from './pages/DataPengguna';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
+import LogAktivitas from './pages/LogAktivitas';
 import './App.css';
 
 const PrivateRoute = ({ children, role }) => {
   const { user } = useAuth();
   if (!user) return <Navigate to="/" />;
-  if (role && user.role !== role) return <Navigate to="/" />;
+  if (role && user.role !== role) {
+    // Redirect based on user role
+    if (user.role === 'superadmin') return <Navigate to="/superadmin/laporan" />;
+    if (user.role === 'admin') return <Navigate to="/admin/laporan" />;
+    return <Navigate to="/dashboard" />;
+  }
   return children;
-};
-
-const Layout = ({ children }) => {
-  const { user } = useAuth();
-  const isAdmin = user && user.role === 'admin';
-  return (
-    <div>
-      <Topbar />
-      {isAdmin && <Sidebar />}
-      <div className="main-content">
-        {children}
-      </div>
-    </div>
-  );
 };
 
 function App() {
@@ -44,39 +36,85 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
+          {/* Public Routes */}
           <Route path="/" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
+
+          {/* User Routes */}
           <Route path="/dashboard" element={
-            <PrivateRoute role="user"><Layout><Dashboard /></Layout></PrivateRoute>
+            <PrivateRoute role="user"><Dashboard /></PrivateRoute>
           } />
           <Route path="/buat-laporan" element={
-            <PrivateRoute role="user"><Layout><BuatLaporan /></Layout></PrivateRoute>
+            <PrivateRoute role="user"><BuatLaporan /></PrivateRoute>
           } />
           <Route path="/riwayat-laporan" element={
-            <PrivateRoute role="user"><Layout><RiwayatLaporan /></Layout></PrivateRoute>
-          } />
-          <Route path="/admin" element={<Navigate to="/admin/laporan" replace />} />
-          <Route path="/admin/laporan" element={
-            <PrivateRoute role="admin"><Layout><SemuaLaporan /></Layout></PrivateRoute>
-          } />
-          <Route path="/admin/laporan-disetujui" element={
-            <PrivateRoute role="admin"><Layout><LaporanDisetujui /></Layout></PrivateRoute>
-          } />
-          <Route path="/admin/laporan-ditolak" element={
-            <PrivateRoute role="admin"><Layout><LaporanDitolak /></Layout></PrivateRoute>
-          } />
-          <Route path="/admin/users" element={
-            <PrivateRoute role="admin"><Layout><DataPengguna /></Layout></PrivateRoute>
-          } />
-          <Route path="/admin/laporan/:id" element={
-            <PrivateRoute role="admin"><Layout><LaporanDetail /></Layout></PrivateRoute>
-          } />
-          <Route path="/admin/print/:id" element={
-            <PrivateRoute role="admin"><Layout><PrintLaporan /></Layout></PrivateRoute>
+            <PrivateRoute role="user"><RiwayatLaporan /></PrivateRoute>
           } />
           <Route path="/profile" element={
-            <PrivateRoute><Layout><ProfilePage /></Layout></PrivateRoute>
+            <PrivateRoute role="user"><ProfilePage /></PrivateRoute>
           } />
+
+          {/* Admin Routes */}
+          <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+          <Route path="/admin/dashboard" element={
+            <PrivateRoute role="admin"><AdminDashboard /></PrivateRoute>
+          } />
+          <Route path="/admin/laporan" element={
+            <PrivateRoute role="admin"><SemuaLaporan /></PrivateRoute>
+          } />
+          <Route path="/admin/laporan-disetujui" element={
+            <PrivateRoute role="admin"><LaporanDisetujui /></PrivateRoute>
+          } />
+          <Route path="/admin/laporan-ditolak" element={
+            <PrivateRoute role="admin"><LaporanDitolak /></PrivateRoute>
+          } />
+          <Route path="/admin/laporan/:id" element={
+            <PrivateRoute role="admin"><LaporanDetail /></PrivateRoute>
+          } />
+          <Route path="/admin/users" element={
+            <PrivateRoute role="admin"><DataPengguna /></PrivateRoute>
+          } />
+          <Route path="/admin/logs" element={
+            <PrivateRoute role="admin"><LogAktivitas /></PrivateRoute>
+          } />
+          <Route path="/admin/print/:id" element={
+            <PrivateRoute role="admin"><PrintLaporan /></PrivateRoute>
+          } />
+
+          {/* Super Admin Routes */}
+          <Route path="/superadmin" element={<Navigate to="/superadmin/dashboard" replace />} />
+          <Route path="/superadmin/dashboard" element={
+            <PrivateRoute role="superadmin"><AdminDashboard /></PrivateRoute>
+          } />
+          <Route path="/superadmin/laporan" element={
+            <PrivateRoute role="superadmin"><SemuaLaporan /></PrivateRoute>
+          } />
+          <Route path="/superadmin/laporan-disetujui" element={
+            <PrivateRoute role="superadmin"><LaporanDisetujui /></PrivateRoute>
+          } />
+          <Route path="/superadmin/laporan-ditolak" element={
+            <PrivateRoute role="superadmin"><LaporanDitolak /></PrivateRoute>
+          } />
+          <Route path="/superadmin/laporan/:id" element={
+            <PrivateRoute role="superadmin"><LaporanDetail /></PrivateRoute>
+          } />
+          <Route path="/superadmin/users" element={
+            <PrivateRoute role="superadmin"><DataPengguna /></PrivateRoute>
+          } />
+          <Route path="/superadmin/logs" element={
+            <PrivateRoute role="superadmin"><LogAktivitas /></PrivateRoute>
+          } />
+          <Route path="/superadmin/profile" element={
+            <PrivateRoute role="superadmin"><ProfilePage /></PrivateRoute>
+          } />
+          <Route path="/superadmin/print/:id" element={
+            <PrivateRoute role="superadmin"><PrintLaporan /></PrivateRoute>
+          } />
+
+          {/* Catch all */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
     </AuthProvider>

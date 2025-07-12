@@ -8,7 +8,7 @@ const LaporanSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   status: { type: String, enum: ['Belum Dicek', 'Disetujui', 'Ditolak'], default: 'Belum Dicek' },
   tanggal: { type: Date, default: Date.now },
-  foto: { type: String },
+  foto: [{ type: String }],
 }, { timestamps: true });
 
 module.exports = mongoose.model('Laporan', LaporanSchema); 

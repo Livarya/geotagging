@@ -1,24 +1,30 @@
-import React from 'react';
-import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';  
+import { useLocation } from 'react-router-dom';
 import './Topbar.css';
 
+const pageTitles = {
+  '/dashboard': 'Dashboard',
+  '/buat-laporan': 'Buat Laporan',
+  '/riwayat-laporan': 'Riwayat Laporan',
+  '/profile': 'Profil Saya',
+  '/admin': 'Admin Panel',
+  '/admin/laporan': 'Semua Laporan',
+  '/admin/laporan-disetujui': 'Laporan Disetujui',
+  '/admin/laporan-ditolak': 'Laporan Ditolak',
+  '/admin/users': 'Data Pengguna',
+};
+
 const Topbar = () => {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
+  const location = useLocation();
+  const title = pageTitles[location.pathname] || 'SIPERIKSA';
 
   return (
     <header className="topbar">
-      <div className="topbar-left" onClick={() => navigate(user?.role === 'admin' ? '/admin' : '/dashboard')}>
-        <span className="topbar-logo">📝</span>
-        <span className="topbar-title">Sistem Laporan Pemeriksaan</span>
-      </div>
-      <div className="topbar-right">
-        <button className="topbar-btn" onClick={() => navigate('/profile')}>{user?.nama || 'Profil'}</button>
-        <button className="topbar-btn logout" onClick={() => { logout(); navigate('/'); }}>Logout</button>
+      <div className="topbar-center">
+        <span className="topbar-title">{title}</span>
       </div>
     </header>
   );
 };
 
-export default Topbar; 
+export default Topbar;
