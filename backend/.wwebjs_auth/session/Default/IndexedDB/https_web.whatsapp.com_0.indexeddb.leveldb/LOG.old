@@ -1,0 +1,15 @@
+2025/07/14-14:20:46.181 f38 Reusing MANIFEST D:\percobaan\BAP-PKL-1\backend\.wwebjs_auth\session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2025/07/14-14:20:46.181 f38 Recovering log #161
+2025/07/14-14:20:46.349 f38 Reusing old log D:\percobaan\BAP-PKL-1\backend\.wwebjs_auth\session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000161.log 
+2025/07/14-14:20:47.837 4b74 Level-0 table #170: started
+2025/07/14-14:20:48.024 4b74 Level-0 table #170: 769599 bytes OK
+2025/07/14-14:20:48.054 4b74 Delete type=0 #161
+2025/07/14-14:20:48.054 4b74 Manual compaction at level-0 from '\x00 \x00\x00\x00' @ 72057594037927935 : 1 .. '\x00!\x00\x00\x00' @ 0 : 0; will stop at (end)
+2025/07/14-14:20:49.301 4f7c Compacting 1@1 + 5@2 files
+2025/07/14-14:20:49.575 4f7c Generated table #171@1: 55506 keys, 2219226 bytes
+2025/07/14-14:20:49.775 4f7c Generated table #172@1: 2482 keys, 2158514 bytes
+2025/07/14-14:20:49.967 4f7c Generated table #173@1: 10714 keys, 2182075 bytes
+2025/07/14-14:20:50.149 4f7c Generated table #174@1: 24560 keys, 2229009 bytes
+2025/07/14-14:20:50.328 4f7c Generated table #175@1: 80807 keys, 2211511 bytes
+2025/07/14-14:20:50.328 4f7c Compacted 1@1 + 5@2 files => 11000335 bytes
+2025/07/14-14:20:50.354 4f7c compacted to: files[ 0 0 5 0 0 0 0 ]

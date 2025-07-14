@@ -6,7 +6,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import AdminLayout from '../components/AdminLayout';
 import SuperAdminLayout from '../components/SuperAdminLayout';
-import { FaEye, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
+import { FaEye, FaCheckCircle, FaTimesCircle, FaTrash } from 'react-icons/fa';
 
 const LaporanDisetujui = () => {
   const { token, user } = useAuth();
@@ -189,7 +189,7 @@ const LaporanDisetujui = () => {
                     cursor: 'pointer'
                   }}
                 >
-                  <FaEye />
+                  <FaEye size={16} />
                 </button>
                 <button
                   onClick={(e) => handleSetujui(l._id, e)}
@@ -202,7 +202,7 @@ const LaporanDisetujui = () => {
                     cursor: 'pointer'
                   }}
                 >
-                  <FaCheckCircle />
+                  <FaCheckCircle size={16} />
                 </button>
                 <button
                   onClick={(e) => handleTolak(l._id, e)}
@@ -215,7 +215,21 @@ const LaporanDisetujui = () => {
                     cursor: 'pointer'
                   }}
                 >
-                  <FaTimesCircle />
+                  <FaTimesCircle size={16} />
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); setModal({ open: true, id: l._id }); }}
+                  style={{
+                    padding: '8px',
+                    borderRadius: '8px',
+                    background: 'rgba(239, 68, 68, 0.5)',
+                    border: '1px solid rgba(239, 68, 68, 0.2)',
+                    color: '#fff',
+                    cursor: 'pointer'
+                  }}
+                  title="Hapus Laporan"
+                >
+                  <FaTrash size={16} />
                 </button>
               </div>
 
@@ -255,6 +269,61 @@ const LaporanDisetujui = () => {
         pauseOnHover
         style={{ zIndex: 9999 }}
       />
+      {/* Modal konfirmasi hapus */}
+      {modal.open && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999
+        }}>
+          <div style={{
+            background: '#fff',
+            borderRadius: '12px',
+            padding: '32px',
+            minWidth: '320px',
+            textAlign: 'center'
+          }}>
+            <div style={{ marginBottom: '24px', color: '#111', fontWeight: 600, fontSize: '18px' }}>
+              Yakin ingin menghapus laporan ini?
+            </div>
+            <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
+              <button
+                onClick={handleDelete}
+                style={{
+                  padding: '10px 24px',
+                  borderRadius: '8px',
+                  background: '#ef4444',
+                  color: '#fff',
+                  border: 'none',
+                  fontWeight: 600,
+                  fontSize: '16px',
+                  cursor: 'pointer'
+                }}
+              >Hapus</button>
+              <button
+                onClick={() => setModal({ open: false, id: null })}
+                style={{
+                  padding: '10px 24px',
+                  borderRadius: '8px',
+                  background: '#e5e7eb',
+                  color: '#111',
+                  border: 'none',
+                  fontWeight: 600,
+                  fontSize: '16px',
+                  cursor: 'pointer'
+                }}
+              >Batal</button>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 };

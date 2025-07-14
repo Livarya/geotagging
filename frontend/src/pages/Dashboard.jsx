@@ -106,7 +106,7 @@ const Dashboard = () => {
                   </span>
                 </div>
               </div>
-              {Array.isArray(laporanTerakhir.foto) && laporanTerakhir.foto.length > 0 && (
+              {Array.isArray(laporanTerakhir.foto) && typeof laporanTerakhir.foto[0] === 'string' && laporanTerakhir.foto.length > 0 && (
                 <div style={{
                   minWidth: '80px',
                   height: '80px',

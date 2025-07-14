@@ -153,11 +153,10 @@ const DataPengguna = () => {
             display: 'flex',
             alignItems: 'center'
           }}>
-            <FaSearch style={{
+            <FaSearch size={14} style={{
               position: 'absolute',
               left: '12px',
-              color: 'rgba(255, 255, 255, 0.5)',
-              fontSize: '14px'
+              color: 'rgba(255, 255, 255, 0.5)'
             }} />
             <input
               type="text"
@@ -228,13 +227,12 @@ const DataPengguna = () => {
               color: '#fff',
               fontSize: '14px',
               cursor: 'pointer',
-              transition: 'background 0.2s',
-              '&:hover': {
-                background: '#1d4ed8'
-              }
+              transition: 'background 0.2s'
             }}
+            onMouseOver={(e) => e.currentTarget.style.background = '#1d4ed8'}
+            onMouseOut={(e) => e.currentTarget.style.background = '#2563eb'}
           >
-            <FaPlus /> Tambah User
+            <FaPlus size={14} /> Tambah User
           </button>
         </div>
 
@@ -312,7 +310,7 @@ const DataPengguna = () => {
                             cursor: 'pointer'
                           }}
                         >
-                          <FaEdit />
+                          <FaEdit size={14} />
                         </button>
                         <button
                           onClick={() => setDeleteId(user._id)}
@@ -325,7 +323,7 @@ const DataPengguna = () => {
                             cursor: 'pointer'
                           }}
                         >
-                          <FaTrash />
+                          <FaTrash size={14} />
                         </button>
                       </div>
                     </td>

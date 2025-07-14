@@ -9,8 +9,9 @@ const BuatLaporan = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     nama_merk: '',
-    npwpd: '',
     alamat: '',
+    npwpd: '',
+    hasil_pemeriksaan: '',
     foto: []
   });
   
@@ -24,8 +25,9 @@ const BuatLaporan = () => {
 
     const data = new FormData();
     data.append('nama_merk', formData.nama_merk);
-    data.append('npwpd', formData.npwpd);
     data.append('alamat', formData.alamat);
+    data.append('npwpd', formData.npwpd);
+    data.append('hasil_pemeriksaan', formData.hasil_pemeriksaan);
     for (let i = 0; i < formData.foto.length; i++) {
       data.append('foto', formData.foto[i]);
     }
@@ -104,6 +106,34 @@ const BuatLaporan = () => {
               marginBottom: '8px',
               fontSize: '14px'
             }}>
+              Alamat
+            </label>
+            <textarea
+              name="alamat"
+              value={formData.alamat}
+              onChange={handleChange}
+              required
+              style={{
+                width: '100%',
+                padding: '10px 12px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: '8px',
+                color: '#fff',
+                fontSize: '16px',
+                minHeight: '100px',
+                resize: 'vertical'
+              }}
+            />
+          </div>
+
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{
+              display: 'block',
+              color: '#fff',
+              marginBottom: '8px',
+              fontSize: '14px'
+            }}>
               NPWPD
             </label>
             <input
@@ -131,11 +161,11 @@ const BuatLaporan = () => {
               marginBottom: '8px',
               fontSize: '14px'
             }}>
-              Alamat
+              Hasil Pemeriksaan
             </label>
             <textarea
-              name="alamat"
-              value={formData.alamat}
+              name="hasil_pemeriksaan"
+              value={formData.hasil_pemeriksaan}
               onChange={handleChange}
               required
               style={{
@@ -159,7 +189,7 @@ const BuatLaporan = () => {
               marginBottom: '8px',
               fontSize: '14px'
             }}>
-              Foto
+              Foto Dokumentasi
             </label>
             <input
               type="file"

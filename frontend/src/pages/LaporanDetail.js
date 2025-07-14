@@ -12,6 +12,9 @@ const LaporanDetail = () => {
   const [laporan, setLaporan] = useState(null);
   const [showLightbox, setShowLightbox] = useState(false);
   const [lightboxIdx, setLightboxIdx] = useState(0);
+  const [catatan, setCatatan] = useState('');
+  const [showCatatanModal, setShowCatatanModal] = useState(false);
+  const [statusAction, setStatusAction] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,6 +41,127 @@ const LaporanDetail = () => {
     window.print();
   };
 
+  const handleStatusAction = (status) => {
+    setStatusAction(status);
+    setShowCatatanModal(true);
+  };
+
+  const handleSubmitStatus = async () => {
+    try {
+      await axios.put(`/api/laporan/${laporan._id}/status`, 
+        { status: statusAction, catatan }, 
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const res = await axios.get(`/api/laporan/${laporan._id}`, { headers: { Authorization: `Bearer ${token}` } });
+      setLaporan(res.data);
+      setShowCatatanModal(false);
+      setCatatan('');
+    } catch (error) {
+      console.error('Error updating status:', error);
+    }
+  };
+
+  // Modal untuk catatan
+  const CatatanModal = () => {
+    if (!showCatatanModal) return null;
+
+    return (
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 1000
+      }}>
+        <div style={{
+          backgroundColor: '#1e293b',
+          borderRadius: '12px',
+          padding: '24px',
+          width: '90%',
+          maxWidth: '500px',
+          boxShadow: '0 4px 24px rgba(0, 0, 0, 0.2)',
+          border: '1px solid rgba(255, 255, 255, 0.1)'
+        }}>
+          <h3 style={{ 
+            color: '#fff', 
+            marginTop: 0,
+            marginBottom: '16px',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+            paddingBottom: '12px'
+          }}>
+            {statusAction === 'Disetujui' ? 'Setujui Laporan' : 'Tolak Laporan'}
+          </h3>
+          
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{
+              display: 'block',
+              color: '#fff',
+              marginBottom: '8px',
+              fontSize: '14px'
+            }}>
+              Catatan (Opsional)
+            </label>
+            <textarea
+              value={catatan}
+              onChange={(e) => setCatatan(e.target.value)}
+              placeholder="Tambahkan catatan untuk pengguna..."
+              style={{
+                width: '100%',
+                padding: '10px 12px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: '8px',
+                color: '#fff',
+                fontSize: '16px',
+                minHeight: '100px',
+                resize: 'vertical'
+              }}
+            />
+          </div>
+          
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+            <button
+              onClick={() => {
+                setShowCatatanModal(false);
+                setCatatan('');
+              }}
+              style={{
+                padding: '8px 16px',
+                borderRadius: '8px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                color: '#fff',
+                border: 'none',
+                fontSize: '14px',
+                cursor: 'pointer'
+              }}
+            >
+              Batal
+            </button>
+            <button
+              onClick={handleSubmitStatus}
+              style={{
+                padding: '8px 16px',
+                borderRadius: '8px',
+                background: statusAction === 'Disetujui' ? '#22c55e' : '#ef4444',
+                color: '#fff',
+                border: 'none',
+                fontSize: '14px',
+                cursor: 'pointer'
+              }}
+            >
+              {statusAction === 'Disetujui' ? 'Setujui' : 'Tolak'}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div style={{ 
       minHeight: '100vh',
@@ -45,6 +169,9 @@ const LaporanDetail = () => {
       backdropFilter: 'blur(10px)',
       padding: '20px'
     }}>
+      {/* Render modal catatan */}
+      <CatatanModal />
+
       <div style={{
         maxWidth: '800px',
         margin: '0 auto',
@@ -78,7 +205,7 @@ const LaporanDetail = () => {
                 gap: '8px'
               }}
             >
-              <FaArrowLeft /> Kembali
+              <FaArrowLeft size={16} /> Kembali
             </button>
           </div>
           <button
@@ -95,7 +222,7 @@ const LaporanDetail = () => {
               gap: '8px'
             }}
           >
-            <FaPrint /> Cetak
+            <FaPrint size={16} /> Cetak
           </button>
         </div>
 
@@ -170,6 +297,12 @@ const LaporanDetail = () => {
                   </span>
                 </td>
               </tr>
+              {laporan.catatan && (
+                <tr>
+                  <td style={{ color: 'rgba(255, 255, 255, 0.7)' }}>Catatan</td>
+                  <td style={{ fontWeight: '500' }}>{laporan.catatan}</td>
+                </tr>
+              )}
               <tr>
                 <td style={{ color: 'rgba(255, 255, 255, 0.7)' }}>Tanggal</td>
                 <td style={{ fontWeight: '500' }}>{new Date(laporan.tanggal).toLocaleString('id-ID', { 
@@ -188,6 +321,37 @@ const LaporanDetail = () => {
             </tbody>
           </table>
         </div>
+
+        {laporan.status === 'Belum Dicek' && (
+          <div style={{ display: 'flex', gap: '12px', marginTop: '24px', justifyContent: 'center' }}>
+            <button
+              onClick={() => handleStatusAction('Disetujui')}
+              style={{
+                padding: '10px 20px',
+                borderRadius: '8px',
+                background: '#22c55e',
+                color: '#fff',
+                border: 'none',
+                fontWeight: 600,
+                fontSize: '16px',
+                cursor: 'pointer'
+              }}
+            >Setujui</button>
+            <button
+              onClick={() => handleStatusAction('Ditolak')}
+              style={{
+                padding: '10px 20px',
+                borderRadius: '8px',
+                background: '#ef4444',
+                color: '#fff',
+                border: 'none',
+                fontWeight: 600,
+                fontSize: '16px',
+                cursor: 'pointer'
+              }}
+            >Tolak</button>
+          </div>
+        )}
 
         {/* Foto Section */}
         {fotoArr.length > 0 && (

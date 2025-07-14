@@ -161,7 +161,7 @@ const AdminDashboard = () => {
                   </span>
                 </div>
               </div>
-              {Array.isArray(l.foto) && l.foto.length > 0 && (
+              {Array.isArray(l.foto) && typeof l.foto[0] === 'string' && l.foto.length > 0 && (
                 <div style={{
                   minWidth: '80px',
                   height: '80px',

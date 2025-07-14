@@ -12,10 +12,10 @@ exports.getMe = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
   try {
-    const { nip, nama, jabatan, email } = req.body;
+    const { nip, nama, jabatan, email, whatsappNumber } = req.body;
     const user = await User.findByIdAndUpdate(
       req.user.id,
-      { nip, nama, jabatan, email },
+      { nip, nama, jabatan, email, whatsappNumber },
       { new: true, runValidators: true, context: 'query' }
     ).select('-password');
     res.json(user);

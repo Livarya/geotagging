@@ -6,6 +6,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import AdminLayout from '../components/AdminLayout';
 import SuperAdminLayout from '../components/SuperAdminLayout';
+import { FaEye } from 'react-icons/fa';
 
 const SemuaLaporan = () => {
   const { token, user } = useAuth();
@@ -34,16 +35,6 @@ const SemuaLaporan = () => {
     }
     setLoading(false);
   };
-
-  const filtered = laporan.filter(l => {
-    const matchSearch =
-      l.nama_merk.toLowerCase().includes(search.toLowerCase()) ||
-      l.user?.nama?.toLowerCase().includes(search.toLowerCase()) ||
-      l.npwpd.toLowerCase().includes(search.toLowerCase());
-    const matchStatus = status ? l.status === status : true;
-    const matchTanggal = tanggal ? l.tanggal.slice(0, 10) === tanggal : true;
-    return matchSearch && matchStatus && matchTanggal;
-  });
 
   const handleStatus = async (id, status) => {
     try {
@@ -147,66 +138,135 @@ const SemuaLaporan = () => {
             )
             .filter(l => !status || l.status === status)
             .filter(l => !tanggal || new Date(l.tanggal).toLocaleDateString() === new Date(tanggal).toLocaleDateString())
-            .map(l => (
-              <div 
-                key={l._id} 
-                onClick={() => navigate(`/laporan/${l._id}`)}
-                style={{
-                  background: 'rgba(30, 41, 59, 0.5)',
-                  backdropFilter: 'blur(10px)',
-                  borderRadius: '12px',
-                  padding: '20px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '18px',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  cursor: 'pointer',
-                  transition: 'transform 0.2s, box-shadow 0.2s',
-                  '&:hover': {
-                    transform: 'translateY(-2px)',
-                    boxShadow: '0 6px 16px rgba(0, 0, 0, 0.3)'
-                  }
-                }}
-              >
-                <div style={{ flex: 1, color: '#fff' }}>
-                  <div style={{ fontWeight: '600', fontSize: '16px' }}>{l.nama_merk}
-                    <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', marginLeft: '8px' }}>({l.npwpd})</span>
+            .map(l => {
+              const fotoArr = Array.isArray(l.foto) ? l.foto : l.foto ? [l.foto] : [];
+              return (
+                <div 
+                  key={l._id} 
+                  style={{
+                    background: 'rgba(30, 41, 59, 0.5)',
+                    backdropFilter: 'blur(10px)',
+                    borderRadius: '12px',
+                    padding: '20px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '18px',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    cursor: 'pointer',
+                    transition: 'transform 0.2s, box-shadow 0.2s',
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 6px 16px rgba(0, 0, 0, 0.3)'
+                    }
+                  }}
+                >
+                  <div style={{ flex: 1, color: '#fff' }}>
+                    <div style={{ fontWeight: '600', fontSize: '16px' }}>
+                      {typeof l.nama_merk === 'string' ? l.nama_merk : 'Nama tidak tersedia'}
+                      <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', marginLeft: '8px' }}>
+                        ({typeof l.npwpd === 'string' ? l.npwpd : 'NPWPD tidak tersedia'})
+                      </span>
+                    </div>
+                    <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', margin: '4px 0' }}>
+                      {typeof l.alamat === 'string' ? l.alamat : 'Alamat tidak tersedia'}
+                    </div>
+                    <div style={{ fontSize: '13px' }}>
+                      <span style={{
+                        color: l.status === 'Disetujui' ? '#4ade80' : 
+                               l.status === 'Ditolak' ? '#f87171' : '#fbbf24',
+                        fontWeight: 600,
+                        marginRight: '12px'
+                      }}>
+                        {typeof l.status === 'string' ? l.status : 'Status tidak tersedia'}
+                      </span>
+                      <span style={{ color: 'rgba(255,255,255,0.6)' }}>
+                        {l.tanggal ? new Date(l.tanggal).toLocaleString() : 'Tanggal tidak tersedia'}
+                      </span>
+                    </div>
                   </div>
-                  <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', margin: '4px 0' }}>{l.alamat}</div>
-                  <div style={{ fontSize: '13px' }}>
-                    <span style={{
-                      color: l.status === 'Disetujui' ? '#4ade80' : 
-                             l.status === 'Ditolak' ? '#f87171' : '#fbbf24',
-                      fontWeight: 600,
-                      marginRight: '12px'
-                    }}>{l.status}</span>
-                    <span style={{ color: 'rgba(255,255,255,0.6)' }}>
-                      {new Date(l.tanggal).toLocaleString()}
-                    </span>
-                  </div>
+                  
+                  {/* Thumbnail Foto */}
+                  {fotoArr.length > 0 ? (
+                    <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                      {fotoArr.map((foto, idx) => (
+                        <img
+                          key={idx}
+                          src={typeof foto === 'string' ? `http://localhost:5000/uploads/${foto}` : ''}
+                          alt={`Foto ${idx + 1}`}
+                          style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px' }}
+                        />
+                      )).slice(0, 3)}
+                      {fotoArr.length > 3 && (
+                        <div style={{ 
+                          width: '60px', 
+                          height: '60px', 
+                          background: 'rgba(0,0,0,0.5)', 
+                          borderRadius: '4px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: 'white'
+                        }}>
+                          +{fotoArr.length - 3}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <span style={{ color: 'rgba(255,255,255,0.5)' }}>Tidak ada foto</span>
+                  )}
+                  
+                  {/* Tombol aksi lihat detail */}
+                  <button
+                    onClick={() => {
+                      const prefix = user?.role === 'superadmin' ? '/superadmin' : '/admin';
+                      navigate(`${prefix}/laporan/${l._id}`);
+                    }}
+                    style={{
+                      padding: '8px',
+                      borderRadius: '8px',
+                      background: 'rgba(59, 130, 246, 0.5)',
+                      border: '1px solid rgba(59, 130, 246, 0.2)',
+                      color: '#fff',
+                      cursor: 'pointer',
+                      marginRight: '8px'
+                    }}
+                    title="Lihat Detail"
+                  >
+                    <FaEye size={16} />
+                  </button>
+                  
+                  {/* Tombol aksi jika status Belum Dicek */}
+                  {l.status === 'Belum Dicek' && (
+                    <div style={{ display: 'flex', gap: '8px', marginLeft: '16px' }} onClick={e => e.stopPropagation()}>
+                      <button
+                        onClick={() => handleStatus(l._id, 'Disetujui')}
+                        style={{
+                          padding: '8px 12px',
+                          borderRadius: '8px',
+                          background: '#22c55e',
+                          color: '#fff',
+                          border: 'none',
+                          cursor: 'pointer',
+                          fontWeight: 600
+                        }}
+                      >Setujui</button>
+                      <button
+                        onClick={() => handleStatus(l._id, 'Ditolak')}
+                        style={{
+                          padding: '8px 12px',
+                          borderRadius: '8px',
+                          background: '#ef4444',
+                          color: '#fff',
+                          border: 'none',
+                          cursor: 'pointer',
+                          fontWeight: 600
+                        }}
+                      >Tolak</button>
+                    </div>
+                  )}
                 </div>
-                {Array.isArray(l.foto) && l.foto.length > 0 && (
-                  <div style={{
-                    minWidth: '80px',
-                    height: '80px',
-                    position: 'relative',
-                    borderRadius: '8px',
-                    overflow: 'hidden',
-                    border: '1px solid rgba(255,255,255,0.1)'
-                  }}>
-                    <img 
-                      src={`http://localhost:5000/uploads/${l.foto[0]}`} 
-                      alt="foto" 
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover'
-                      }} 
-                    />
-                  </div>
-                )}
-              </div>
-            ))}
+              );
+            })}
         </div>
       </div>
       <ToastContainer />

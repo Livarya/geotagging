@@ -9,6 +9,7 @@ const ProfilePage = () => {
   const [formData, setFormData] = useState({
     nama: user?.nama || '',
     email: user?.email || '',
+    whatsappNumber: user?.whatsappNumber || '',
     password: '',
     newPassword: '',
     confirmPassword: ''
@@ -28,7 +29,7 @@ const ProfilePage = () => {
     setSuccess('');
 
     try {
-      const res = await axios.put('/api/users/profile', formData, {
+      const res = await axios.put('/api/users/me', formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUser(res.data);
@@ -36,7 +37,7 @@ const ProfilePage = () => {
       setIsEditing(false);
       setFormData(prev => ({ ...prev, password: '', newPassword: '', confirmPassword: '' }));
     } catch (err) {
-      setError(err.response?.data?.message || 'Terjadi kesalahan');
+      setError(err.response?.data?.msg || 'Terjadi kesalahan');
     } finally {
       setLoading(false);
     }
@@ -101,6 +102,11 @@ const ProfilePage = () => {
             <div>
               <h3 style={{ color: '#fff', margin: '0 0 4px 0' }}>{user?.nama}</h3>
               <p style={{ color: 'rgba(255,255,255,0.7)', margin: 0 }}>{user?.email}</p>
+              {user?.whatsappNumber && (
+                <p style={{ color: 'rgba(255,255,255,0.7)', margin: '4px 0 0 0' }}>
+                  WA: {user.whatsappNumber}
+                </p>
+              )}
             </div>
           </div>
 
@@ -174,6 +180,36 @@ const ProfilePage = () => {
                     fontSize: '16px'
                   }}
                 />
+              </div>
+
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{
+                  display: 'block',
+                  color: '#fff',
+                  marginBottom: '8px',
+                  fontSize: '14px'
+                }}>
+                  Nomor WhatsApp
+                </label>
+                <input
+                  type="text"
+                  name="whatsappNumber"
+                  value={formData.whatsappNumber}
+                  onChange={handleChange}
+                  placeholder="Contoh: 08123456789"
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: '8px',
+                    color: '#fff',
+                    fontSize: '16px'
+                  }}
+                />
+                <small style={{ color: 'rgba(255,255,255,0.5)', display: 'block', marginTop: '4px' }}>
+                  Untuk menerima notifikasi status laporan via WhatsApp
+                </small>
               </div>
 
               <div style={{ marginBottom: '20px' }}>

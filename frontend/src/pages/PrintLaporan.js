@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { FaPrint, FaWhatsapp } from 'react-icons/fa';
 
 const LOGO_URL = '/logo192.png'; // Ganti dengan logo instansi jika ada
 
@@ -9,12 +10,41 @@ const PrintLaporan = () => {
   const { id } = useParams();
   const { token } = useAuth();
   const [laporan, setLaporan] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState(null);
 
   useEffect(() => {
     axios.get(`/api/laporan/${id}`, { headers: { Authorization: `Bearer ${token}` } })
       .then(res => setLaporan(res.data))
       .catch(() => setLaporan(null));
   }, [id, token]);
+
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const handleSendWhatsApp = async () => {
+    setLoading(true);
+    setMessage(null);
+    
+    try {
+      const response = await axios.post(`/api/laporan/${id}/send-pdf`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      setMessage({
+        type: 'success',
+        text: 'PDF berhasil dikirim ke WhatsApp pengguna'
+      });
+    } catch (error) {
+      setMessage({
+        type: 'error',
+        text: error.response?.data?.msg || 'Gagal mengirim PDF ke WhatsApp'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (!laporan) return <div>Loading...</div>;
 
@@ -23,7 +53,59 @@ const PrintLaporan = () => {
 
   return (
     <div className="print-container" style={{maxWidth:'800px',margin:'0 auto',background:'#fff',padding:'40px 60px',fontFamily:'Times New Roman, Times, serif',fontSize:18,boxShadow:'0 2px 12px #bbb'}}>
-      <button onClick={() => window.print()} style={{float:'right',marginBottom:20}}>🖨️ Print</button>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginBottom: 20 }}>
+        <button 
+          onClick={handlePrint} 
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px',
+            padding: '8px 12px',
+            background: '#4a6bdf',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          <FaPrint /> Print
+        </button>
+        
+        <button 
+          onClick={handleSendWhatsApp} 
+          disabled={loading}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px',
+            padding: '8px 12px',
+            background: '#25D366',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: loading ? 'not-allowed' : 'pointer',
+            opacity: loading ? 0.7 : 1
+          }}
+        >
+          <FaWhatsapp /> {loading ? 'Mengirim...' : 'Kirim WhatsApp'}
+        </button>
+      </div>
+      
+      {message && (
+        <div 
+          style={{
+            padding: '10px',
+            marginBottom: '15px',
+            borderRadius: '4px',
+            background: message.type === 'success' ? '#d4edda' : '#f8d7da',
+            color: message.type === 'success' ? '#155724' : '#721c24',
+            border: `1px solid ${message.type === 'success' ? '#c3e6cb' : '#f5c6cb'}`
+          }}
+        >
+          {message.text}
+        </div>
+      )}
+      
       {/* Halaman 1 */}
       <div>
         <div style={{textAlign:'center',marginBottom:24}}>
@@ -54,6 +136,12 @@ const PrintLaporan = () => {
               <td><b>Nama Merk</b></td>
               <td>: {laporan.nama_merk}</td>
             </tr>
+            {laporan.catatan && (
+              <tr>
+                <td><b>Catatan</b></td>
+                <td>: {laporan.catatan}</td>
+              </tr>
+            )}
           </tbody>
         </table>
         <div style={{margin:'18px 0'}}>

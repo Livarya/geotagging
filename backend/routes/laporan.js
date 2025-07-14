@@ -20,7 +20,8 @@ const {
   getAllLaporan,
   getLaporanById,
   updateStatusLaporan,
-  deleteLaporan
+  deleteLaporan,
+  generateAndSendPdf
 } = require('../controllers/laporanController');
 
 router.post('/upload', auth, upload.array('foto', 4), (req, res) => {
@@ -29,11 +30,14 @@ router.post('/upload', auth, upload.array('foto', 4), (req, res) => {
   res.json({ filenames: req.files.map(f => f.filename) });
 });
 
-router.post('/', auth, createLaporan);
+router.post('/', auth, upload.array('foto', 4), createLaporan);
 router.get('/user', auth, getUserLaporan);
-router.get('/', auth, isAdmin, getAllLaporan);
+router.get('/', auth, getAllLaporan);
 router.get('/:id', auth, getLaporanById);
 router.put('/:id/status', auth, isAdmin, updateStatusLaporan);
-router.delete('/:id', auth, isAdmin, deleteLaporan);
+router.delete('/:id', auth, deleteLaporan);
+
+// Route untuk generate dan kirim PDF via WhatsApp
+router.post('/:id/send-pdf', auth, isAdmin, generateAndSendPdf);
 
 module.exports = router; 
