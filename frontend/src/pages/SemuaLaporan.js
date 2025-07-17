@@ -7,6 +7,18 @@ import 'react-toastify/dist/ReactToastify.css';
 import AdminLayout from '../components/AdminLayout';
 import SuperAdminLayout from '../components/SuperAdminLayout';
 import { FaEye } from 'react-icons/fa';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+import markerImg from '../assets/marker.png';
+
+const customMarker = new L.Icon({
+  iconUrl: markerImg,
+  iconSize: [40, 40],
+  iconAnchor: [20, 40],
+  popupAnchor: [0, -40]
+});
+// Hapus/fix kode icon leaflet jika error, karena react-leaflet v4 sudah handle default icon
 
 const SemuaLaporan = () => {
   const { token, user } = useAuth();
@@ -24,6 +36,13 @@ const SemuaLaporan = () => {
     fetchLaporan();
     // eslint-disable-next-line
   }, [status, tanggal]);
+
+  // Tambahkan log untuk debug marker
+  useEffect(() => {
+    if (laporan && laporan.length > 0) {
+      console.log('Laporan dengan koordinat:', laporan.filter(l => l.latitude && l.longitude));
+    }
+  }, [laporan]);
 
   const fetchLaporan = async () => {
     setLoading(true);
@@ -68,6 +87,32 @@ const SemuaLaporan = () => {
   return (
     <Layout title="Semua Laporan">
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        {/* Peta Lokasi Laporan */}
+        <div style={{ height: '350px', width: '100%', marginBottom: '16px', borderRadius: '12px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
+          <MapContainer center={[-6.9147, 107.6098]} zoom={13} style={{ height: '100%', width: '100%' }} scrollWheelZoom={true}>
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            {laporan.filter(l => l.latitude && l.longitude).map(l => (
+              <Marker key={l._id} position={[l.latitude, l.longitude]} icon={customMarker}>
+                <Popup>
+                  <div>
+                    <strong>{l.nama_merk}</strong><br/>
+                    {l.alamat}<br/>
+                    Status: {l.status}<br/>
+                    {l.tanggal ? new Date(l.tanggal).toLocaleString() : ''}
+                    {Array.isArray(l.foto) && l.foto.length > 0 && (
+                      <div style={{marginTop: 8}}>
+                        <img src={`http://localhost:5000/uploads/${l.foto[0]}`} alt="foto" style={{width: 80, height: 80, objectFit: 'cover', borderRadius: 4}} />
+                      </div>
+                    )}
+                  </div>
+                </Popup>
+              </Marker>
+            ))}
+          </MapContainer>
+        </div>
         {/* Search and Filter Controls */}
         <div style={{
           display: 'flex',

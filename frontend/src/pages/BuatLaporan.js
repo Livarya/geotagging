@@ -4,6 +4,22 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 
+// Titik pusat area geo-fencing (misal: Bandung)
+const GEO_CENTER = { lat: -6.935678, lng: 107.659607};
+const GEO_RADIUS_M = 1000; // 5 km
+
+function haversine(lat1, lon1, lat2, lon2) {
+  function toRad(x) { return x * Math.PI / 180; }
+  const R = 6371000; // meters
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+}
+
 const BuatLaporan = () => {
   const { token } = useAuth();
   const navigate = useNavigate();
@@ -17,11 +33,42 @@ const BuatLaporan = () => {
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [location, setLocation] = useState({ lat: null, lng: null });
+  const [locError, setLocError] = useState('');
+
+  React.useEffect(() => {
+    if (!('geolocation' in navigator)) {
+      setLocError('Geolocation tidak didukung browser.');
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        setLocError('');
+      },
+      (err) => {
+        setLocError('Gagal mengambil lokasi: ' + err.message);
+      },
+      { enableHighAccuracy: true }
+    );
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    if (!location.lat || !location.lng) {
+      setError('Lokasi tidak tersedia. Pastikan GPS aktif dan izinkan akses lokasi.');
+      setLoading(false);
+      return;
+    }
+    // Geo-fencing validation
+    const distance = haversine(location.lat, location.lng, GEO_CENTER.lat, GEO_CENTER.lng);
+    if (distance > GEO_RADIUS_M) {
+      setError('Anda berada di luar area yang diizinkan untuk membuat laporan.');
+      setLoading(false);
+      return;
+    }
 
     const data = new FormData();
     data.append('nama_merk', formData.nama_merk);
@@ -31,6 +78,8 @@ const BuatLaporan = () => {
     for (let i = 0; i < formData.foto.length; i++) {
       data.append('foto', formData.foto[i]);
     }
+    data.append('latitude', location.lat);
+    data.append('longitude', location.lng);
 
     try {
       await axios.post('/api/laporan', data, {
@@ -70,6 +119,37 @@ const BuatLaporan = () => {
             {error}
           </div>
         )}
+        {locError && (
+          <div style={{
+            background: 'rgba(239, 68, 68, 0.1)',
+            color: '#ef4444',
+            padding: '12px',
+            borderRadius: '8px',
+            marginBottom: '20px',
+            border: '1px solid rgba(239, 68, 68, 0.2)'
+          }}>
+            {locError}
+          </div>
+        )}
+        <div style={{ marginBottom: '20px' }}>
+          <label style={{ display: 'block', color: '#fff', marginBottom: '8px', fontSize: '14px' }}>
+            Lokasi (Latitude, Longitude)
+          </label>
+          <input
+            type="text"
+            value={location.lat && location.lng ? `${location.lat}, ${location.lng}` : 'Mengambil lokasi...'}
+            readOnly
+            style={{
+              width: '100%',
+              padding: '10px 12px',
+              background: 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '8px',
+              color: '#fff',
+              fontSize: '16px'
+            }}
+          />
+        </div>
 
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: '20px' }}>

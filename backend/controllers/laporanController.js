@@ -12,7 +12,7 @@ exports.createLaporan = async (req, res) => {
   try {
     console.log('BODY:', req.body);
     console.log('FILES:', req.files);
-    const { nama_merk, npwpd, alamat, hasil_pemeriksaan } = req.body;
+    const { nama_merk, npwpd, alamat, hasil_pemeriksaan, latitude, longitude } = req.body;
     if (!nama_merk || !npwpd || !alamat || !hasil_pemeriksaan) {
       return res.status(400).json({ msg: 'Semua field wajib diisi', body: req.body, files: req.files });
     }
@@ -21,13 +21,16 @@ exports.createLaporan = async (req, res) => {
     if (req.files && req.files.length > 0) {
       fotoArr = req.files.map(file => file.filename);
     }
+    console.log('Latitude:', latitude, 'Longitude:', longitude);
     const laporan = new Laporan({
       nama_merk,
       npwpd,
       alamat,
       hasil_pemeriksaan,
       user: req.user.id,
-      foto: fotoArr
+      foto: fotoArr,
+      latitude: latitude !== undefined && latitude !== '' ? Number(latitude) : undefined,
+      longitude: longitude !== undefined && longitude !== '' ? Number(longitude) : undefined
     });
     await laporan.save();
     res.status(201).json(laporan);

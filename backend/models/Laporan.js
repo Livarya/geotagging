@@ -10,6 +10,8 @@ const LaporanSchema = new mongoose.Schema({
   catatan: { type: String }, // Catatan dari admin saat menyetujui/menolak
   tanggal: { type: Date, default: Date.now },
   foto: [{ type: String }],
+  latitude: { type: Number },
+  longitude: { type: Number },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Laporan', LaporanSchema); 
