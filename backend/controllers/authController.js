@@ -8,8 +8,8 @@ exports.register = async (req, res) => {
   console.log('REGISTER RAW BODY:', req.body);
   console.log('REGISTER BODY:', req.body);
   try {
-    const { nip, nama, jabatan, username, email, password, role } = req.body;
-    if (!nip || !nama || !jabatan || !username || !email || !password) {
+    const { nip, nohp, nama, jabatan, username, email, password, role } = req.body;
+    if (!nip || !nohp || !nama || !jabatan || !username || !email || !password) {
       console.log('REGISTER ERROR: Field kosong');
       return res.status(400).json({ msg: 'Semua field wajib diisi' });
     }
@@ -26,7 +26,7 @@ exports.register = async (req, res) => {
     const finalRole = allowedRoles.includes(role) ? role : 'user';
     console.log('REGISTER ROLE:', finalRole);
     console.log('REGISTER: Membuat user baru...');
-    const user = new User({ nip, nama, jabatan, username, email, password: hashedPassword, role: finalRole });
+    const user = new User({ nip, nohp, nama, jabatan, username, email, password: hashedPassword, role: finalRole });
     await user.save();
     console.log('REGISTER SUCCESS:', user);
     res.status(201).json({ msg: 'Registrasi berhasil' });
@@ -38,12 +38,14 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-    const { identifier, password } = req.body;
-    if (!identifier || !password) {
+    const { nip, password } = req.body;
+    if (!nip || !password) {
       return res.status(400).json({ msg: 'Semua field wajib diisi' });
     }
-    const user = await User.findOne({ $or: [ { email: identifier }, { username: identifier } ] });
-    console.log('LOGIN USER:', user);
+    if (!/^\d{18}$/.test(nip)) {
+      return res.status(400).json({ msg: 'NIP harus 18 digit angka' });
+    }
+    const user = await User.findOne({ nip });
     if (!user) {
       return res.status(400).json({ msg: 'User tidak ditemukan' });
     }
@@ -59,7 +61,9 @@ exports.login = async (req, res) => {
         role: user.role,
         jabatan: user.jabatan,
         email: user.email,
-        username: user.username
+        username: user.username,
+        nip: user.nip,
+        nohp: user.nohp
       }
     });
   } catch (err) {

@@ -9,11 +9,11 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const login = async (identifier, password) => {
+  const login = async (nip, password) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await axios.post('/api/auth/login', { identifier, password });
+      const res = await axios.post('/api/auth/login', { nip, password });
       setUser(res.data.user);
       setToken(res.data.token);
       setLoading(false);

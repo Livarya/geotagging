@@ -3,14 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const LoginPage = () => {
-  const [identifier, setIdentifier] = useState('');
+  const [nip, setNip] = useState('');
   const [password, setPassword] = useState('');
   const { login, error, loading, user } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const loggedIn = await login(identifier, password);
+    const loggedIn = await login(nip, password);
     if (loggedIn) {
       if (loggedIn.role === 'superadmin') {
         navigate('/superadmin/dashboard');
@@ -27,7 +27,17 @@ const LoginPage = () => {
       <div className="card" style={{maxWidth:380,width:'100%',padding:'36px 32px',margin:'32px 0'}}>
         <h2 style={{textAlign:'center',fontWeight:700,color:'var(--primary-blue)',marginBottom:24}}>Login</h2>
         <form onSubmit={handleSubmit} style={{display:'flex',flexDirection:'column',gap:16}}>
-          <input type="text" placeholder="Email atau Username" value={identifier} onChange={e => setIdentifier(e.target.value)} required />
+          <input
+            type="text"
+            placeholder="NIP"
+            value={nip}
+            onChange={e => { if (/^\d{0,18}$/.test(e.target.value)) setNip(e.target.value); }}
+            required
+            minLength={18}
+            maxLength={18}
+            pattern="\d{18}"
+            title="NIP harus 18 digit angka"
+          />
           <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
           <button type="submit" disabled={loading}>Login</button>
           {error && <div style={{color:'red',marginTop:8}}>{error}</div>}

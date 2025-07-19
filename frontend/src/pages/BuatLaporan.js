@@ -5,8 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 
 // Titik pusat area geo-fencing (misal: Bandung)
-const GEO_CENTER = { lat: -6.935678, lng: 107.659607};
-const GEO_RADIUS_M = 1000; // 5 km
+const GEO_CENTER = { lat: -6.935694, lng: 107.659633};
+const GEO_RADIUS_M = 10000; // 5 km
 
 function haversine(lat1, lon1, lat2, lon2) {
   function toRad(x) { return x * Math.PI / 180; }
@@ -57,6 +57,11 @@ const BuatLaporan = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    if (formData.npwpd.length !== 13 || !/^\d{13}$/.test(formData.npwpd)) {
+      setError('NPWPD harus 13 digit angka!');
+      setLoading(false);
+      return;
+    }
     if (!location.lat || !location.lng) {
       setError('Lokasi tidak tersedia. Pastikan GPS aktif dan izinkan akses lokasi.');
       setLoading(false);
@@ -131,7 +136,7 @@ const BuatLaporan = () => {
             {locError}
           </div>
         )}
-        <div style={{ marginBottom: '20px' }}>
+        {/* <div style={{ marginBottom: '20px' }}>
           <label style={{ display: 'block', color: '#fff', marginBottom: '8px', fontSize: '14px' }}>
             Lokasi (Latitude, Longitude)
           </label>
@@ -149,7 +154,7 @@ const BuatLaporan = () => {
               fontSize: '16px'
             }}
           />
-        </div>
+        </div> */}
 
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: '20px' }}>
@@ -201,7 +206,7 @@ const BuatLaporan = () => {
                 borderRadius: '8px',
                 color: '#fff',
                 fontSize: '16px',
-                minHeight: '100px',
+                minHeight: '40px',
                 resize: 'vertical'
               }}
             />
@@ -220,8 +225,14 @@ const BuatLaporan = () => {
               type="text"
               name="npwpd"
               value={formData.npwpd}
-              onChange={handleChange}
+              onChange={e => {
+                if (/^\d{0,13}$/.test(e.target.value)) handleChange(e);
+              }}
               required
+              minLength={13}
+              maxLength={13}
+              pattern="\d{13}"
+              title="NPWPD harus 13 digit angka"
               style={{
                 width: '100%',
                 padding: '10px 12px',

@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const RegisterPage = () => {
-  const [form, setForm] = useState({ nip: '', nama: '', jabatan: '', username: '', email: '', password: '', role: 'user' });
+  const [form, setForm] = useState({ nip: '', nohp: '', nama: '', jabatan: '', username: '', email: '', password: '', role: 'user' });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -11,8 +11,12 @@ const RegisterPage = () => {
   const handleChange = e => {
     const { name, value } = e.target;
     if (name === 'nip') {
-      // Hanya angka, max 18 digit
+      // Hanya angka, harus 18 digit
       if (!/^\d{0,18}$/.test(value)) return;
+    }
+    if (name === 'nohp') {
+      // Hanya angka, max 13 digit
+      if (!/^\d{0,13}$/.test(value)) return;
     }
     setForm({ ...form, [name]: value });
   };
@@ -36,6 +40,7 @@ const RegisterPage = () => {
         <h2 style={{textAlign:'center',fontWeight:700,color:'var(--primary-blue)',marginBottom:24}}>Register</h2>
         <form onSubmit={handleSubmit} style={{display:'flex',flexDirection:'column',gap:16}}>
           <input name="nip" placeholder="NIP" value={form.nip} onChange={handleChange} required minLength={18} maxLength={18} pattern="\d{18}" title="NIP harus 18 digit angka" />
+          <input name="nohp" placeholder="No HP" value={form.nohp} onChange={handleChange} required maxLength={13} pattern="\d{10,13}" title="No HP harus 10-13 digit angka" />
           <input name="nama" placeholder="Nama Lengkap" value={form.nama} onChange={handleChange} required />
           <input name="jabatan" placeholder="Jabatan" value={form.jabatan} onChange={handleChange} required />
           <input name="username" placeholder="Username" value={form.username} onChange={handleChange} required />

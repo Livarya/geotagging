@@ -6,7 +6,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import AdminLayout from '../components/AdminLayout';
 import SuperAdminLayout from '../components/SuperAdminLayout';
-import { FaEye } from 'react-icons/fa';
+import { FaEye, FaPrint } from 'react-icons/fa';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -278,6 +278,26 @@ const SemuaLaporan = () => {
                     title="Lihat Detail"
                   >
                     <FaEye size={16} />
+                  </button>
+
+                  {/* Tombol cetak BERITA ACARA */}
+                  <button
+                    onClick={() => {
+                      const prefix = user?.role === 'superadmin' ? '/superadmin' : '/admin';
+                      navigate(`${prefix}/laporan/${l._id}/cetak`);
+                    }}
+                    style={{
+                      padding: '8px',
+                      borderRadius: '8px',
+                      background: 'rgba(168, 85, 247, 0.5)',
+                      border: '1px solid rgba(168, 85, 247, 0.2)',
+                      color: '#fff',
+                      cursor: 'pointer',
+                      marginRight: '8px'
+                    }}
+                    title="Cetak BERITA ACARA"
+                  >
+                    <FaPrint size={16} />
                   </button>
                   
                   {/* Tombol aksi jika status Belum Dicek */}

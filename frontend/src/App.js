@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import LaporanDetail from './pages/LaporanDetail';
 import PrintLaporan from './pages/PrintLaporan';
+import AdminCetakLaporan from './pages/AdminCetakLaporan';
 import ProfilePage from './pages/ProfilePage';
 import BuatLaporan from './pages/BuatLaporan';
 import RiwayatLaporan from './pages/RiwayatLaporan';
@@ -82,6 +83,9 @@ function App() {
           <Route path="/admin/print/:id" element={
             <PrivateRoute role="admin"><PrintLaporan /></PrivateRoute>
           } />
+          <Route path="/admin/laporan/:id/cetak" element={
+            <PrivateRoute role="admin"><AdminCetakLaporan /></PrivateRoute>
+          } />
 
           {/* Super Admin Routes */}
           <Route path="/superadmin" element={<Navigate to="/superadmin/dashboard" replace />} />
@@ -111,6 +115,9 @@ function App() {
           } />
           <Route path="/superadmin/print/:id" element={
             <PrivateRoute role="superadmin"><PrintLaporan /></PrivateRoute>
+          } />
+          <Route path="/superadmin/laporan/:id/cetak" element={
+            <PrivateRoute role="superadmin"><AdminCetakLaporan /></PrivateRoute>
           } />
 
           {/* Catch all */}

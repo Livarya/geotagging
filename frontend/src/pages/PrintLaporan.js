@@ -51,149 +51,350 @@ const PrintLaporan = () => {
   // Siapkan array foto
   const fotoArr = Array.isArray(laporan.foto) ? laporan.foto : laporan.foto ? [laporan.foto] : [];
 
+  // Fungsi untuk memisahkan NPWPD ke dalam kotak-kotak
+  const renderNPWPDBoxes = (npwpd) => {
+    const digits = npwpd ? npwpd.toString().split('') : [];
+    const boxes = [];
+    
+    for (let i = 0; i < 10; i++) {
+      boxes.push(
+        <div key={i} style={{
+          width: '25px',
+          height: '30px',
+          border: '1px solid #000',
+          display: 'inline-block',
+          textAlign: 'center',
+          lineHeight: '30px',
+          marginRight: '2px',
+          fontSize: '12px',
+          fontWeight: 'bold'
+        }}>
+          {digits[i] || ''}
+        </div>
+      );
+    }
+    return boxes;
+  };
+
   return (
-    <div className="print-container" style={{maxWidth:'800px',margin:'0 auto',background:'#fff',padding:'40px 60px',fontFamily:'Times New Roman, Times, serif',fontSize:18,boxShadow:'0 2px 12px #bbb'}}>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginBottom: 20 }}>
-        <button 
-          onClick={handlePrint} 
+    <div style={{ 
+      fontFamily: 'Arial, sans-serif',
+      maxWidth: '800px',
+      margin: '0 auto',
+      padding: '20px',
+      backgroundColor: '#fff',
+      color: '#000'
+    }}>
+      {/* Header Controls */}
+      <div style={{ 
+        marginBottom: '20px',
+        display: 'flex',
+        gap: '10px',
+        justifyContent: 'center'
+      }}>
+        <button
+          onClick={handlePrint}
           style={{
+            background: '#2563eb',
+            color: '#fff',
+            border: 'none',
+            padding: '10px 20px',
+            borderRadius: '5px',
+            cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
-            gap: '5px',
-            padding: '8px 12px',
-            background: '#4a6bdf',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer'
+            gap: '8px'
           }}
         >
-          <FaPrint /> Print
+          <FaPrint size={16} /> Cetak
         </button>
-        
-        <button 
-          onClick={handleSendWhatsApp} 
+        <button
+          onClick={handleSendWhatsApp}
           disabled={loading}
           style={{
+            background: '#25d366',
+            color: '#fff',
+            border: 'none',
+            padding: '10px 20px',
+            borderRadius: '5px',
+            cursor: loading ? 'not-allowed' : 'pointer',
             display: 'flex',
             alignItems: 'center',
-            gap: '5px',
-            padding: '8px 12px',
-            background: '#25D366',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: loading ? 'not-allowed' : 'pointer',
+            gap: '8px',
             opacity: loading ? 0.7 : 1
           }}
         >
-          <FaWhatsapp /> {loading ? 'Mengirim...' : 'Kirim WhatsApp'}
+          <FaWhatsapp size={16} /> Kirim WhatsApp
         </button>
       </div>
-      
+
       {message && (
-        <div 
-          style={{
-            padding: '10px',
-            marginBottom: '15px',
-            borderRadius: '4px',
-            background: message.type === 'success' ? '#d4edda' : '#f8d7da',
-            color: message.type === 'success' ? '#155724' : '#721c24',
-            border: `1px solid ${message.type === 'success' ? '#c3e6cb' : '#f5c6cb'}`
-          }}
-        >
+        <div style={{
+          padding: '10px',
+          marginBottom: '20px',
+          borderRadius: '5px',
+          backgroundColor: message.type === 'success' ? '#d1fae5' : '#fee2e2',
+          color: message.type === 'success' ? '#065f46' : '#991b1b',
+          textAlign: 'center'
+        }}>
           {message.text}
         </div>
       )}
-      
-      {/* Halaman 1 */}
-      <div>
-        <div style={{textAlign:'center',marginBottom:24}}>
-          <img src={LOGO_URL} alt="logo" style={{height:70,marginBottom:10}} />
-          <h2 style={{margin:0,fontFamily:'Times New Roman, Times, serif',fontWeight:700}}>BERITA ACARA PEMERIKSAAN</h2>
-          <div style={{fontSize:16,marginTop:4}}>BAPENDA</div>
+
+      {/* Template Berita Acara */}
+      <div style={{ 
+        border: '2px solid #000',
+        padding: '40px',
+        backgroundColor: '#fff',
+        minHeight: '1000px'
+      }}>
+        {/* Header Instansi */}
+        <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+          <h1 style={{ 
+            margin: '0',
+            fontSize: '18px',
+            fontWeight: 'bold',
+            textTransform: 'uppercase'
+          }}>
+            PEMERINTAH KOTA BANDUNG
+          </h1>
+          <h2 style={{ 
+            margin: '5px 0',
+            fontSize: '16px',
+            fontWeight: 'bold',
+            textTransform: 'uppercase'
+          }}>
+            BADAN PENGELOLAAN PENDAPATAN DAERAH
+          </h2>
+          <p style={{ 
+            margin: '5px 0',
+            fontSize: '12px'
+          }}>
+            Jl. Wastukencana No. 2 Telp. (022) 422 2323 - Bandung
+          </p>
         </div>
-        <hr style={{margin:'18px 0'}} />
-        <table style={{width:'100%',fontSize:18,marginBottom:18}}>
-          <tbody>
-            <tr>
-              <td style={{width:180}}><b>Tanggal</b></td>
-              <td>: {new Date(laporan.tanggal).toLocaleDateString()}</td>
-            </tr>
-            <tr>
-              <td><b>NPWPD</b></td>
-              <td>: {laporan.npwpd}</td>
-            </tr>
-            <tr>
-              <td><b>Nama Petugas</b></td>
-              <td>: {laporan.user?.nama} ({laporan.user?.jabatan})</td>
-            </tr>
-            <tr>
-              <td><b>Alamat</b></td>
-              <td>: {laporan.alamat}</td>
-            </tr>
-            <tr>
-              <td><b>Nama Merk</b></td>
-              <td>: {laporan.nama_merk}</td>
-            </tr>
-            {laporan.catatan && (
+
+        {/* Judul Berita Acara */}
+        <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+          <h3 style={{ 
+            margin: '0',
+            fontSize: '16px',
+            fontWeight: 'bold',
+            textTransform: 'uppercase',
+            textDecoration: 'underline'
+          }}>
+            BERITA ACARA
+          </h3>
+        </div>
+
+        {/* Paragraf Pembuka */}
+        <div style={{ marginBottom: '25px', textAlign: 'justify', lineHeight: '1.6' }}>
+          <p style={{ margin: '0 0 15px 0', fontSize: '12px' }}>
+            Yang bertanda tangan di bawah ini:
+          </p>
+          
+          <div style={{ display: 'flex', gap: '40px', marginBottom: '15px' }}>
+            <div style={{ flex: 1 }}>
+              <p style={{ margin: '0 0 5px 0', fontSize: '12px' }}>
+                <strong>Nama</strong> : _________________________________
+              </p>
+              <p style={{ margin: '0 0 5px 0', fontSize: '12px' }}>
+                <strong>NIP</strong> : _________________________________
+              </p>
+              <p style={{ margin: '0 0 5px 0', fontSize: '12px' }}>
+                <strong>Jabatan</strong> : _________________________________
+              </p>
+            </div>
+            <div style={{ flex: 1 }}>
+              <p style={{ margin: '0 0 5px 0', fontSize: '12px' }}>
+                <strong>Nama</strong> : _________________________________
+              </p>
+              <p style={{ margin: '0 0 5px 0', fontSize: '12px' }}>
+                <strong>NIP</strong> : _________________________________
+              </p>
+              <p style={{ margin: '0 0 5px 0', fontSize: '12px' }}>
+                <strong>Jabatan</strong> : _________________________________
+              </p>
+            </div>
+          </div>
+
+          <p style={{ margin: '0 0 15px 0', fontSize: '12px' }}>
+            Selanjutnya disebut sebagai <strong>PETUGAS</strong>, telah melakukan pemeriksaan pada:
+          </p>
+        </div>
+
+        {/* Data Objek Pemeriksaan */}
+        <div style={{ marginBottom: '25px' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+            <tbody>
               <tr>
-                <td><b>Catatan</b></td>
-                <td>: {laporan.catatan}</td>
+                <td style={{ width: '35%', padding: '5px 0', verticalAlign: 'top' }}>
+                  <strong>Nama Merk Dagang</strong>
+                </td>
+                <td style={{ width: '5%', padding: '5px 0' }}>:</td>
+                <td style={{ width: '60%', padding: '5px 0', borderBottom: '1px solid #000' }}>
+                  {laporan.nama_merk}
+                </td>
               </tr>
-            )}
-          </tbody>
-        </table>
-        <div style={{margin:'18px 0'}}>
-          <b>Hasil Pemeriksaan:</b>
-          <div style={{border:'1px solid #bbb',borderRadius:6,padding:14,minHeight:80,marginTop:6}}>{laporan.hasil_pemeriksaan}</div>
+              <tr>
+                <td style={{ padding: '5px 0', verticalAlign: 'top' }}>
+                  <strong>Alamat Merk Dagang</strong>
+                </td>
+                <td style={{ padding: '5px 0' }}>:</td>
+                <td style={{ padding: '5px 0', borderBottom: '1px solid #000' }}>
+                  {laporan.alamat}
+                </td>
+              </tr>
+              <tr>
+                <td style={{ padding: '5px 0', verticalAlign: 'top' }}>
+                  <strong>NPWPD</strong>
+                </td>
+                <td style={{ padding: '5px 0' }}>:</td>
+                <td style={{ padding: '5px 0', borderBottom: '1px solid #000' }}>
+                  {renderNPWPDBoxes(laporan.npwpd)}
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-      </div>
-      {/* Page Break */}
-      {fotoArr.length > 0 && (
-        <div style={{pageBreakBefore:'always',marginTop:40}}>
-          <h3 style={{textAlign:'center',marginBottom:24}}>Foto Dokumentasi</h3>
-          <div style={{display:'flex',flexWrap:'wrap',gap:18,justifyContent:'center'}}>
-            {fotoArr.map((f, idx) => (
-              <img key={idx} src={`http://localhost:5000/uploads/${f}`} alt={`foto${idx}`} style={{maxWidth:260, maxHeight:200, borderRadius:8, boxShadow:'0 1px 6px #bbb',marginBottom:12}} />
-            ))}
+
+        {/* Hasil Pemeriksaan */}
+        <div style={{ marginBottom: '25px' }}>
+          <p style={{ margin: '0 0 10px 0', fontSize: '12px', fontWeight: 'bold' }}>
+            HASIL PEMERIKSAAN:
+          </p>
+          <div style={{
+            border: '1px solid #000',
+            padding: '15px',
+            minHeight: '120px',
+            fontSize: '12px',
+            lineHeight: '1.5'
+          }}>
+            {laporan.hasil_pemeriksaan}
           </div>
         </div>
-      )}
-      {/* Tanda tangan di halaman terakhir */}
-      <div style={{marginTop:40,display:'flex',justifyContent:'flex-end'}}>
-        <div style={{textAlign:'center',minWidth:220}}>
-          <div>Petugas Pemeriksa</div>
-          <br /><br /><br />
-          <div style={{marginTop:40}}>( {laporan.user?.nama} )</div>
+
+        {/* Foto Dokumentasi */}
+        {fotoArr.length > 0 && (
+          <div style={{ marginBottom: '25px' }}>
+            <p style={{ margin: '0 0 10px 0', fontSize: '12px', fontWeight: 'bold' }}>
+              DOKUMENTASI FOTO:
+            </p>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+              gap: '10px'
+            }}>
+              {fotoArr.map((foto, index) => (
+                <div key={index} style={{
+                  border: '1px solid #ccc',
+                  padding: '5px',
+                  textAlign: 'center'
+                }}>
+                  <img
+                    src={`http://localhost:5000/uploads/${foto}`}
+                    alt={`Foto ${index + 1}`}
+                    style={{
+                      width: '100%',
+                      height: '120px',
+                      objectFit: 'cover',
+                      marginBottom: '5px'
+                    }}
+                  />
+                  <p style={{ margin: '0', fontSize: '10px' }}>Foto {index + 1}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Penutup */}
+        <div style={{ marginBottom: '25px', textAlign: 'justify', lineHeight: '1.6' }}>
+          <p style={{ margin: '0 0 15px 0', fontSize: '12px' }}>
+            Berita acara ini dibuat dengan sebenarnya dan dapat dipergunakan sebagaimana mestinya.
+          </p>
+        </div>
+
+        {/* Tanda Tangan */}
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between',
+          marginTop: '40px'
+        }}>
+          <div style={{ textAlign: 'center', flex: 1 }}>
+            <p style={{ margin: '0 0 50px 0', fontSize: '12px' }}>
+              Penanggung Jawab,
+            </p>
+            <p style={{ margin: '0 0 5px 0', fontSize: '12px' }}>
+              <strong>Nama</strong> : _________________________________
+            </p>
+            <p style={{ margin: '0 0 5px 0', fontSize: '12px' }}>
+              <strong>Jabatan</strong> : _________________________________
+            </p>
+            <p style={{ margin: '0 0 5px 0', fontSize: '12px' }}>
+              <strong>NIP</strong> : _________________________________
+            </p>
+          </div>
+          
+          <div style={{ textAlign: 'center', flex: 1 }}>
+            <p style={{ margin: '0 0 50px 0', fontSize: '12px' }}>
+              Petugas Pendata 1,
+            </p>
+            <p style={{ margin: '0 0 5px 0', fontSize: '12px' }}>
+              <strong>Nama</strong> : _________________________________
+            </p>
+            <p style={{ margin: '0 0 5px 0', fontSize: '12px' }}>
+              <strong>Jabatan</strong> : _________________________________
+            </p>
+            <p style={{ margin: '0 0 5px 0', fontSize: '12px' }}>
+              <strong>NIP</strong> : _________________________________
+            </p>
+          </div>
+          
+          <div style={{ textAlign: 'center', flex: 1 }}>
+            <p style={{ margin: '0 0 50px 0', fontSize: '12px' }}>
+              Petugas Pendata 2,
+            </p>
+            <p style={{ margin: '0 0 5px 0', fontSize: '12px' }}>
+              <strong>Nama</strong> : _________________________________
+            </p>
+            <p style={{ margin: '0 0 5px 0', fontSize: '12px' }}>
+              <strong>Jabatan</strong> : _________________________________
+            </p>
+            <p style={{ margin: '0 0 5px 0', fontSize: '12px' }}>
+              <strong>NIP</strong> : _________________________________
+            </p>
+          </div>
+        </div>
+
+        {/* Tanggal */}
+        <div style={{ textAlign: 'center', marginTop: '30px' }}>
+          <p style={{ margin: '0', fontSize: '12px' }}>
+            Bandung, _____ _______________ 20__
+          </p>
         </div>
       </div>
+
       <style>{`
         @media print {
-          body { background: #fff !important; }
-          button { display: none !important; }
-          .sidebar, .topbar { display: none !important; }
-          @page {
-            size: A4 portrait;
-            margin: 10mm;
+          body { 
+            background: white !important; 
+            margin: 0 !important;
+            padding: 0 !important;
           }
-          html, body, #root, .print-container {
-            width: 210mm !important;
-            min-height: 297mm !important;
-            max-height: 297mm !important;
-            overflow: hidden !important;
+          button { 
+            display: none !important; 
+          }
+          div { 
+            background: white !important; 
+            box-shadow: none !important; 
+          }
+          * { 
+            color: black !important; 
           }
           .print-container {
-            transform: scale(0.93); /* adjust if needed */
-            transform-origin: top left;
-            box-shadow: none !important;
-            padding: 0 !important;
-            margin: 0 auto !important;
-            background: #fff !important;
-          }
-          table, tr, td, div {
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
+            border: 2px solid #000 !important;
+            padding: 40px !important;
           }
         }
       `}</style>
