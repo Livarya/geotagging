@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import BASE_URL from '../api';
 
 const RegisterPage = () => {
   const [form, setForm] = useState({ nip: '', nohp: '', nama: '', jabatan: '', username: '', email: '', password: '', role: 'user' });
@@ -26,7 +27,7 @@ const RegisterPage = () => {
     setLoading(true);
     setError(null);
     try {
-      await axios.post('/api/auth/register', form);
+      await axios.post(`${BASE_URL}/api/auth/register`, form);
       navigate('/');
     } catch (err) {
       setError(err.response?.data?.msg || 'Registrasi gagal');

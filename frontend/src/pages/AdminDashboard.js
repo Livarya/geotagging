@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import AdminLayout from '../components/AdminLayout';
 import SuperAdminLayout from '../components/SuperAdminLayout';
+import BASE_URL from '../api';
 
 const AdminDashboard = () => {
   const { token, user } = useAuth();
@@ -24,7 +25,7 @@ const AdminDashboard = () => {
 
   const fetchStats = async () => {
     try {
-      const res = await axios.get('/api/admin/stats', {
+      const res = await axios.get(`${BASE_URL}/api/admin/stats`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setStats(res.data);
@@ -35,7 +36,7 @@ const AdminDashboard = () => {
 
   const fetchRecentLaporan = async () => {
     try {
-      const res = await axios.get('/api/admin/recent-laporan', {
+      const res = await axios.get(`${BASE_URL}/api/admin/recent-laporan`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setRecentLaporan(res.data);
@@ -171,7 +172,7 @@ const AdminDashboard = () => {
                   border: '1px solid rgba(255,255,255,0.1)'
                 }}>
                   <img 
-                    src={`http://localhost:5000/uploads/${l.foto[0]}`} 
+                    src={`${BASE_URL}/uploads/${l.foto[0]}`} 
                     alt="foto" 
                     style={{
                       width: '100%',

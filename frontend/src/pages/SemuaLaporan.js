@@ -11,6 +11,7 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import markerImg from '../assets/marker.png';
+import BASE_URL from '../api';
 
 const customMarker = new L.Icon({
   iconUrl: markerImg,
@@ -47,7 +48,7 @@ const SemuaLaporan = () => {
   const fetchLaporan = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('/api/laporan', { headers: { Authorization: `Bearer ${token}` } });
+      const res = await axios.get(`${BASE_URL}/api/laporan`, { headers: { Authorization: `Bearer ${token}` } });
       setLaporan(res.data);
     } catch {
       setLaporan([]);
@@ -57,7 +58,7 @@ const SemuaLaporan = () => {
 
   const handleStatus = async (id, status) => {
     try {
-      await axios.put(`/api/laporan/${id}/status`, { status }, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.put(`${BASE_URL}/api/laporan/${id}/status`, { status }, { headers: { Authorization: `Bearer ${token}` } });
       toast.success(`Laporan ${status}`);
       fetchLaporan();
     } catch {
@@ -67,7 +68,7 @@ const SemuaLaporan = () => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`/api/laporan/${modal.id}`, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.delete(`${BASE_URL}/api/laporan/${modal.id}`, { headers: { Authorization: `Bearer ${token}` } });
       toast.success('Laporan dihapus');
       setModal({ open: false, id: null });
       fetchLaporan();

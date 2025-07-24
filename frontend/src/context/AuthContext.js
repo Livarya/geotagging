@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext } from 'react';
 import axios from 'axios';
+import BASE_URL from '../api';
 
 const AuthContext = createContext();
 
@@ -13,7 +14,7 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await axios.post('/api/auth/login', { nip, password });
+      const res = await axios.post(`${BASE_URL}/api/auth/login`, { nip, password });
       setUser(res.data.user);
       setToken(res.data.token);
       setLoading(false);

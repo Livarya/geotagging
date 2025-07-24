@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import BASE_URL from '../api';
 import { useAuth } from '../context/AuthContext';
 import { FaFileExcel, FaSearch } from 'react-icons/fa';
 import AdminLayout from '../components/AdminLayout';
@@ -52,7 +53,7 @@ const LogAktivitas = () => {
   const fetchLogs = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('/api/superadmin/logs', { headers: { Authorization: `Bearer ${token}` } });
+      const res = await axios.get(`${BASE_URL}/api/superadmin/logs`, { headers: { Authorization: `Bearer ${token}` } });
       setLog(res.data);
     } catch {
       setLog([]);

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import Layout from '../components/Layout';
+import BASE_URL from '../api';
 
 const Dashboard = () => {
   const { token } = useAuth();
@@ -15,7 +16,7 @@ const Dashboard = () => {
   const fetchLaporan = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('/api/laporan/user', { 
+      const res = await axios.get(`${BASE_URL}/api/laporan/user`, { 
         headers: { Authorization: `Bearer ${token}` } 
       });
       setLaporan(res.data);
@@ -116,7 +117,7 @@ const Dashboard = () => {
                   border: '1px solid rgba(255,255,255,0.1)'
                 }}>
                   <img 
-                    src={`http://localhost:5000/uploads/${laporanTerakhir.foto[0]}`} 
+                    src={`${BASE_URL}/uploads/${laporanTerakhir.foto[0]}`} 
                     alt="foto" 
                     style={{
                       width: '100%',

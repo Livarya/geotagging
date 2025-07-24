@@ -3,10 +3,11 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
+import BASE_URL from '../api';
 
 // Titik pusat area geo-fencing (misal: Bandung)
-const GEO_CENTER = { lat: -6.935694, lng: 107.659633};
-const GEO_RADIUS_M = 10000; // 5 km
+const GEO_CENTER = { lat: -6.935744, lng: 107.659637};
+const GEO_RADIUS_M = 20000; // 5 km
 
 function haversine(lat1, lon1, lat2, lon2) {
   function toRad(x) { return x * Math.PI / 180; }
@@ -87,7 +88,7 @@ const BuatLaporan = () => {
     data.append('longitude', location.lng);
 
     try {
-      await axios.post('/api/laporan', data, {
+      await axios.post(`${BASE_URL}/api/laporan`, data, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'

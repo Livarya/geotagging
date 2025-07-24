@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import BASE_URL from '../api';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -8,7 +9,7 @@ export default function ForgotPassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('/api/auth/forgot-password', { email });
+      const res = await axios.post(`${BASE_URL}/api/auth/forgot-password`, { email });
       setMsg(res.data.msg);
     } catch (err) {
       setMsg(err.response?.data?.msg || 'Terjadi kesalahan');

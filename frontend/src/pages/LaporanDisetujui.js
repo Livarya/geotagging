@@ -7,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import AdminLayout from '../components/AdminLayout';
 import SuperAdminLayout from '../components/SuperAdminLayout';
 import { FaEye, FaCheckCircle, FaTimesCircle, FaTrash } from 'react-icons/fa';
+import BASE_URL from '../api';
 
 const LaporanDisetujui = () => {
   const { token, user } = useAuth();
@@ -26,7 +27,7 @@ const LaporanDisetujui = () => {
   const fetchLaporan = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('/api/laporan', { 
+      const res = await axios.get(`${BASE_URL}/api/laporan`, { 
         headers: { Authorization: `Bearer ${token}` } 
       });
       setLaporan(res.data.filter(l => l.status === 'Disetujui'));
@@ -47,7 +48,7 @@ const LaporanDisetujui = () => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`/api/laporan/${modal.id}`, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.delete(`${BASE_URL}/api/laporan/${modal.id}`, { headers: { Authorization: `Bearer ${token}` } });
       toast.success('Laporan dihapus');
       setModal({ open: false, id: null });
       fetchLaporan();
@@ -59,7 +60,7 @@ const LaporanDisetujui = () => {
   const handleSetujui = async (id, e) => {
     e.stopPropagation();
     try {
-      await axios.put(`/api/laporan/${id}/status`, { status: 'Disetujui' }, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.put(`${BASE_URL}/api/laporan/${id}/status`, { status: 'Disetujui' }, { headers: { Authorization: `Bearer ${token}` } });
       toast.success('Laporan disetujui');
       fetchLaporan();
     } catch {
@@ -70,7 +71,7 @@ const LaporanDisetujui = () => {
   const handleTolak = async (id, e) => {
     e.stopPropagation();
     try {
-      await axios.put(`/api/laporan/${id}/status`, { status: 'Ditolak' }, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.put(`${BASE_URL}/api/laporan/${id}/status`, { status: 'Ditolak' }, { headers: { Authorization: `Bearer ${token}` } });
       toast.success('Laporan ditolak');
       fetchLaporan();
     } catch {

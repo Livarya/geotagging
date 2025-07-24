@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { FaPlus, FaListAlt, FaUser, FaSignOutAlt } from 'react-icons/fa';
+import BASE_URL from '../api';
 
 const Dashboard = () => {
   const { user, token, logout } = useAuth();
@@ -19,7 +20,7 @@ const Dashboard = () => {
   const fetchLaporan = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('/api/laporan/user', { headers: { Authorization: `Bearer ${token}` } });
+      const res = await axios.get(`${BASE_URL}/api/laporan/user`, { headers: { Authorization: `Bearer ${token}` } });
       setLaporan(res.data);
     } catch (err) {
       setLaporan([]);
@@ -250,7 +251,7 @@ const Dashboard = () => {
                       border: '1px solid rgba(255,255,255,0.1)'
                     }}>
                       <img 
-                        src={`http://localhost:5000/uploads/${l.foto[0]}`} 
+                        src={`${BASE_URL}/uploads/${l.foto[0]}`} 
                         alt="foto" 
                         style={{
                           width: '100%',
